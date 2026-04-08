@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fraud Detector</title>
+</head>
+<body>
+
+<h2>Fraud Detection</h2>
+
+<input id="amount" placeholder="Amount" /><br><br>
+<input id="time" placeholder="Time (HH:MM)" /><br><br>
+<input id="location" placeholder="Location" /><br><br>
+
+<label>
+    New Device:
+    <input type="checkbox" id="device" />
+</label><br><br>
+
+<button onclick="detectFraud()">Check Fraud</button>
+
+<h3 id="result"></h3>
+
+<script>
+async function detectFraud() {
+    const data = {
+        amount: parseFloat(document.getElementById("amount").value),
+        time: document.getElementById("time").value,
+        location: document.getElementById("location").value,
+        is_new_device: document.getElementById("device").checked
+    };
+
+    const response = await fetch("http://127.0.0.1:8000/detect", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    let color = result.is_fraud ? "red" : "green";
+
+    document.getElementById("result").innerHTML =
+        `<span style="color:${color}">
+        Fraud Score: ${result.fraud_score}<br>
+        Fraud: ${result.is_fraud}<br>
+        Triggers: ${result.triggers.join(", ")}
+        </span>`;
+}
+</script>
+
+</body>
+</html>
